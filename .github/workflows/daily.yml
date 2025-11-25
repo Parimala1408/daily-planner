@@ -1,0 +1,29 @@
+name: Daily Planner Generator
+
+on:
+  schedule:
+    - cron: "0 7 * * *"   # 7 AM every day
+  workflow_dispatch:      # allows you to run manually
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Generate daily planner
+        run: python generate_plan.py
+
+      - name: Commit files
+        run: |
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@github.com"
+          git add plans || echo "Nothing to add"
+          git commit -m "chore: generate daily planner" || echo "No changes"
+          git push
